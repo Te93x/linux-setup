@@ -21,13 +21,11 @@ echo "📥 Installing zsh-autosuggestions..."
 mkdir -p ~/.zsh/zsh-autosuggestions
 git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions 2>/dev/null || echo "⚠️ Already installed or clone failed."
 
-# Create simple .zshrc with custom prompt + PATH fix
-echo "✍️ Creating .zshrc with custom prompt and user bin PATH..."
+# Create improved .zshrc
+echo "✍️ Creating .zshrc with PATH fix and sudoh alias..."
 cat > ~/.zshrc << 'EOF'
-# Simple ZSH Configuration
-
 # ====================== PATH ======================
-# Add user-local binaries (important for hermes, pip, cargo, etc.)
+# Add user-local binaries (important for hermes, pipx, cargo, etc.)
 export PATH="$HOME/.local/bin:$PATH"
 
 # ====================== Prompt ======================
@@ -37,13 +35,17 @@ PROMPT='%n@%m %1~ %# '
 # Load zsh-autosuggestions
 source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 
-# ====================== Options ======================
-setopt HIST_IGNORE_ALL_DUPS
-setopt SHARE_HISTORY
-
 # ====================== Aliases ======================
 alias ll='ls -lah --color=auto'
 alias update='sudo apt-get update && sudo apt-get upgrade -y'
+
+# Special alias for commands installed in ~/.local/bin (like hermes)
+# Usage: sudoh hermes gateway setup
+alias sudoh='sudo env "PATH=$PATH"'
+
+# ====================== Options ======================
+setopt HIST_IGNORE_ALL_DUPS
+setopt SHARE_HISTORY
 
 echo "✅ ZSH loaded successfully!"
 EOF
@@ -54,9 +56,12 @@ echo ""
 echo "✅ zsh and git installed"
 echo "✅ Default shell changed to zsh"
 echo "✅ zsh-autosuggestions installed"
-echo "✅ .zshrc updated with PATH fix for ~/.local/bin"
+echo "✅ ~/.local/bin added to PATH"
+echo "✅ 'sudoh' alias created for sudo + user PATH"
 echo ""
 echo "Please restart your terminal or run this command now:"
 echo " exec zsh"
 echo ""
-echo "After that, tools like 'hermes' should be found automatically."
+echo "After that you can use:"
+echo "   hermes gateway setup          → normal use"
+echo "   sudoh hermes gateway install --system   → when you need sudo"
