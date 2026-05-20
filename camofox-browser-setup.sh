@@ -7,7 +7,7 @@
 
 set -euo pipefail
 
-echo "=== Camofox Setup & Repair Script ==="
+echo "=== Latest Camofox Setup & Repair Script ==="
 
 REPO_DIR="$HOME/camofox-browser"
 
