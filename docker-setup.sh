@@ -1,31 +1,31 @@
 #!/bin/bash
-# ================================================================
-# Docker Installation Script (minimal + BuildKit + buildx)
-# Fixes legacy builder deprecation for camofox-browser
-# ================================================================
-
 set -euo pipefail
 
-echo "=== Docker Installation Script (with BuildKit + buildx) ==="
+echo "=== Docker Installation Script (Official + BuildKit + buildx) ==="
 
-# Update package index
-echo "→ Updating package index..."
+# Prerequisites
+sudo apt update
+sudo apt install -y ca-certificates curl
+
+# Docker official repo
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
 sudo apt update
 
-# Install Docker if not present
-if ! command -v docker >/dev/null 2>&1; then
-  echo "→ Installing Docker..."
-  sudo apt install -y docker.io
-else
-  echo "→ Docker already installed."
-fi
+# Install
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-# Enable and start Docker service
+# Enable service
 sudo systemctl enable --now docker
-echo "→ Docker service is active."
 
-# === ENABLE BUILDKIT + INSTALL BUILDX PLUGIN ===
-echo "→ Enabling Docker BuildKit and installing buildx plugin..."
+# Enable BuildKit (usually default now, but explicit is fine)
 sudo tee /etc/docker/daemon.json > /dev/null <<EOF
 {
   "features": {
@@ -34,28 +34,17 @@ sudo tee /etc/docker/daemon.json > /dev/null <<EOF
 }
 EOF
 
-sudo apt install -y docker-buildx-plugin
-
-# Create and activate default buildx builder (removes legacy warning permanently)
-echo "→ Setting up default buildx builder..."
+# Create default builder
 docker buildx create --name default --use --bootstrap || true
 
-# Restart Docker to apply everything
 sudo systemctl restart docker
-echo "→ Docker restarted with BuildKit + buildx enabled."
 
-# Add current user to docker group
+# Add user to docker group
 if ! groups | grep -q '\bdocker\b'; then
   sudo usermod -aG docker "$USER"
-  echo "✅ Added $USER to docker group."
-  echo "⚠️  IMPORTANT: Log out and back in (or reboot) for group change to take effect."
-else
-  echo "→ User already in docker group."
+  echo "✅ Added $USER to docker group. Log out/in or reboot."
 fi
 
-echo ""
 echo "================================================================"
 echo "✅ Docker + BuildKit + buildx setup complete!"
-echo "The legacy builder warning should now be gone."
-echo "You can now re-run ./install-camofox.sh"
 echo "================================================================"
