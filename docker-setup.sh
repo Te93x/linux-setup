@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-echo "=== Docker Installation Script (Official + BuildKit + buildx) ==="
+echo "=== Latest Docker Installation Script (Official + BuildKit + buildx) ==="
 
 # Prerequisites
 sudo apt update
