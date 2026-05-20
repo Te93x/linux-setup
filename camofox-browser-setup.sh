@@ -5,7 +5,7 @@
 # - Run once for install, run again anytime to repair/update/restart
 # ================================================================
 set -euo pipefail
-echo "=== Camofox Setup & Repair Script (Latest) ==="
+echo "=== Latest Camofox Setup & Repair Script ==="
 REPO_DIR="$HOME/camofox-browser"
 # 1. Ensure repo exists and is up-to-date
 if [ -d "$REPO_DIR" ]; then
@@ -36,10 +36,11 @@ cat > docker-run.sh << EOF
 #!/bin/bash
 mkdir -p ~/.camofox
 # Dynamic image based on detected architecture
-IMAGE="camofox-browser:135.0.1-${ARCH}"
-# Clean old container
-docker stop camofox-browser 2>/dev/null || true
-docker rm camofox-browser 2>/dev/null || true
+IMAGE="camofox-browser:135.0.1-\${ARCH}"
+
+# Clean old container — use -f so it works even if container is running or restarting
+docker rm -f camofox-browser 2>/dev/null || true
+
 docker run -d \
   --name camofox-browser \
   --restart unless-stopped \
