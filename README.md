@@ -12,3 +12,8 @@ bash <(curl -sSL https://raw.githubusercontent.com/Te93x/linux-setup/refs/heads/
 ```bash
 bash <(curl -sSL https://raw.githubusercontent.com/Te93x/linux-setup/refs/heads/main/docker-setup.sh)
 ```
+
+## Install Camofox Browser
+```bash
+bash <(curl -sSL https://raw.githubusercontent.com/Te93x/linux-setup/refs/heads/main/camofox-browser-setup.sh)
+```
