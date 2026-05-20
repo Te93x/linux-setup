@@ -1,12 +1,12 @@
 #!/bin/bash
 # ================================================================
-# Docker Installation Script (minimal + BuildKit enabled)
-# Required for camofox-browser (uses --mount in Dockerfile)
+# Docker Installation Script (minimal + BuildKit + buildx)
+# Fixes legacy builder deprecation for camofox-browser
 # ================================================================
 
 set -euo pipefail
 
-echo "=== Docker Installation Script (with BuildKit) ==="
+echo "=== Docker Installation Script (with BuildKit + buildx) ==="
 
 # Update package index
 echo "→ Updating package index..."
@@ -24,8 +24,8 @@ fi
 sudo systemctl enable --now docker
 echo "→ Docker service is active."
 
-# === ENABLE BUILDKIT (fixes the --mount error) ===
-echo "→ Enabling Docker BuildKit (required by camofox-browser)..."
+# === ENABLE BUILDKIT + INSTALL BUILDX PLUGIN ===
+echo "→ Enabling Docker BuildKit and installing buildx plugin..."
 sudo tee /etc/docker/daemon.json > /dev/null <<EOF
 {
   "features": {
@@ -34,9 +34,15 @@ sudo tee /etc/docker/daemon.json > /dev/null <<EOF
 }
 EOF
 
-# Restart Docker to apply BuildKit config
+sudo apt install -y docker-buildx-plugin
+
+# Create and activate default buildx builder (removes legacy warning permanently)
+echo "→ Setting up default buildx builder..."
+docker buildx create --name default --use --bootstrap || true
+
+# Restart Docker to apply everything
 sudo systemctl restart docker
-echo "→ Docker restarted with BuildKit enabled."
+echo "→ Docker restarted with BuildKit + buildx enabled."
 
 # Add current user to docker group
 if ! groups | grep -q '\bdocker\b'; then
@@ -49,6 +55,7 @@ fi
 
 echo ""
 echo "================================================================"
-echo "✅ Docker + BuildKit setup complete!"
-echo "You can now run ./install-camofox.sh (it will succeed on 'make build')"
+echo "✅ Docker + BuildKit + buildx setup complete!"
+echo "The legacy builder warning should now be gone."
+echo "You can now re-run ./install-camofox.sh"
 echo "================================================================"
