@@ -1,20 +1,19 @@
 #!/bin/bash
 # ================================================================
-# Camofox Installation Script for Hermes Agent VM
-# - Assumes Docker is already installed
-# - Clones, builds, sets up persistence + VNC + systemd auto-start
-# - Idempotent (safe to re-run for upgrades)
+# Camofox Setup & Repair Script for Hermes Agent VM
+# - Auto-detects architecture (x86_64 or aarch64) exactly like the official Makefile
+# - Run once for install, run again anytime to repair/update/restart
 # ================================================================
 
 set -euo pipefail
 
-echo "=== Camofox Installation Script ==="
+echo "=== Camofox Setup & Repair Script ==="
 
 REPO_DIR="$HOME/camofox-browser"
 
-# 1. Clone / update repo
+# 1. Ensure repo exists and is up-to-date
 if [ -d "$REPO_DIR" ]; then
-  echo "→ Repo exists, pulling latest..."
+  echo "→ Repo exists — pulling latest..."
   cd "$REPO_DIR"
   git pull --ff-only
 else
@@ -23,21 +22,32 @@ else
   cd "$REPO_DIR"
 fi
 
-# 2. Fetch + build (official process)
+# 2. Auto-detect architecture (matches official Makefile logic)
+ARCH=$(uname -m | sed 's/x86_64/x86_64/;s/aarch64/aarch64/;s/arm64/aarch64/')
+echo "→ Detected architecture: $ARCH"
+
+# 3. Fetch latest binaries
 echo "→ Fetching Camoufox binaries..."
 make fetch
 
-echo "→ Building Docker image..."
-make build
+# 4. Build image if missing
+if ! docker image inspect "camofox-browser:135.0.1-${ARCH}" >/dev/null 2>&1; then
+  echo "→ Building Docker image for $ARCH..."
+  make build
+else
+  echo "→ Image camofox-browser:135.0.1-${ARCH} already exists."
+fi
 
-# 3. Enhanced docker-run.sh (persistence + VNC)
-echo "→ Creating docker-run.sh with profile persistence + VNC..."
-cat > docker-run.sh << 'EOF'
+# 5. Create/refresh docker-run.sh with dynamic IMAGE (auto-detect)
+echo "→ Creating/refreshing docker-run.sh with auto-detected architecture..."
+cat > docker-run.sh << EOF
 #!/bin/bash
 mkdir -p ~/.camofox
 
-IMAGE="camofox-browser:135.0.1-x86_64"
+# Dynamic image based on detected architecture
+IMAGE="camofox-browser:135.0.1-${ARCH}"
 
+# Clean old container
 docker stop camofox-browser 2>/dev/null || true
 docker rm camofox-browser 2>/dev/null || true
 
@@ -52,17 +62,17 @@ docker run -d \
   -e VNC_RESOLUTION=1920x1080 \
   -e MAX_OLD_SPACE_SIZE=2048 \
   -v ~/.camofox:/root/.camofox \
-  "${IMAGE}"
+  "\${IMAGE}"
 EOF
 
 chmod +x docker-run.sh
 
-# 4. Start container
-echo "→ Starting Camofox container..."
+# 6. (Re)start the container
+echo "→ (Re)starting Camofox container..."
 ./docker-run.sh
 
-# 5. Systemd service (true boot auto-start)
-echo "→ Installing systemd service..."
+# 7. Systemd service (unchanged — still perfect)
+echo "→ Ensuring systemd service is installed..."
 sudo tee /etc/systemd/system/camofox-browser.service > /dev/null <<EOF
 [Unit]
 Description=Camofox Browser Server for Hermes Agent
@@ -85,32 +95,34 @@ EOF
 sudo systemctl daemon-reload
 sudo systemctl enable --now camofox-browser.service
 
-# 6. Hermes config
-echo "→ Configuring Hermes..."
+# 8. Health check
+echo "→ Running health check..."
+if curl -s -f http://localhost:9377/health >/dev/null 2>&1; then
+  echo "✅ Camofox is healthy."
+else
+  echo "⚠️  Health check failed — restarting..."
+  sudo systemctl restart camofox-browser.service
+fi
+
+# 9. Hermes config (unchanged)
+echo "→ Ensuring Hermes is configured..."
 HERMES_ENV="$HOME/.hermes/.env"
 mkdir -p "$HOME/.hermes"
-if [ -f "$HERMES_ENV" ] && grep -q "^CAMOFOX_URL=" "$HERMES_ENV" 2>/dev/null; then
-  echo "CAMOFOX_URL already configured."
-else
+if ! grep -q "^CAMOFOX_URL=" "$HERMES_ENV" 2>/dev/null; then
   echo "CAMOFOX_URL=http://localhost:9377" >> "$HERMES_ENV"
   echo "✅ Added CAMOFOX_URL to Hermes .env"
 fi
 
-# Restart Hermes if possible
 if command -v hermes >/dev/null 2>&1; then
   hermes gateway restart || true
 fi
 
-# 7. Final status
+# 10. Final status
 echo ""
 echo "================================================================"
-echo "✅ CAMOFOX INSTALLED & CONFIGURED!"
-echo "Auto-starts on boot via systemd."
+echo "✅ CAMOFOX SETUP/REPAIR COMPLETE!"
+echo "Architecture detected: $ARCH"
+echo "Image used: camofox-browser:135.0.1-${ARCH}"
 echo ""
-echo "Verify:"
-echo "  docker ps | grep camofox"
-echo "  curl -I http://localhost:9377/health"
-echo "  journalctl -u camofox-browser -f"
-echo ""
-echo "Live view: http://YOUR-VM-IP:6080"
+echo "Run this script again anytime to repair/update/restart."
 echo "================================================================"
