@@ -43,6 +43,9 @@ alias update='sudo apt-get update && sudo apt-get upgrade -y'
 # Usage: sudoh hermes gateway setup
 alias sudoh='sudo env "PATH=$PATH"'
 
+# Check running systemd services
+alias rs='systemctl list-units --type=service --state=running'
+
 # ====================== Options ======================
 setopt HIST_IGNORE_ALL_DUPS
 setopt SHARE_HISTORY
