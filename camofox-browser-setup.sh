@@ -35,10 +35,10 @@ echo "→ Creating/refreshing docker-run.sh with auto-detected architecture..."
 cat > docker-run.sh << EOF
 #!/bin/bash
 mkdir -p ~/.camofox
-# Dynamic image based on detected architecture
-IMAGE="camofox-browser:135.0.1-\${ARCH}"
+# Image name is baked in at creation time (ARCH is known here)
+IMAGE="camofox-browser:135.0.1-${ARCH}"
 
-# Clean old container — use -f so it works even if container is running or restarting
+# Clean old container — force remove so reruns are always safe
 docker rm -f camofox-browser 2>/dev/null || true
 
 docker run -d \
