@@ -42,7 +42,12 @@ sudo systemctl restart docker
 # Add user to docker group
 if ! groups | grep -q '\bdocker\b'; then
   sudo usermod -aG docker "$USER"
-  echo "✅ Added $USER to docker group. Log out/in or reboot."
+  echo "✅ Added $USER to docker group."
+  echo ""
+  echo "👉 To apply changes without rebooting, run this command now:"
+  echo "   su - $USER"
+  echo ""
+  echo "   (After that you can run docker commands without sudo)"
 fi
 
 echo "================================================================"
