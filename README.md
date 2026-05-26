@@ -20,5 +20,5 @@ bash <(curl -sSL https://raw.githubusercontent.com/Te93x/linux-setup/refs/heads/
 
 ## Install TPM2 LUKS
 ```bash
-bash <(curl -sSL https://raw.githubusercontent.com/Te93x/linux-setup/refs/heads/main/tpm2-luks-setup.sh)
+curl -sSL https://raw.githubusercontent.com/Te93x/linux-setup/refs/heads/main/tpm2-luks-setup.sh | sudo bash
 ```
