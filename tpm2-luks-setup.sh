@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================================
-# TPM2 + Clevis LUKS Auto-Unlock Setup Script (Updated)
+# TPM2 LUKS Auto-Unlock Setup Script (Fixed for Ubuntu)
 # For your system: /dev/vda3
 # =============================================================================
 
@@ -13,7 +13,8 @@ echo
 
 # Check if running as root
 if [[ $EUID -ne 0 ]]; then
-   echo "❌ Please run this script with sudo"
+   echo "❌ This script must be run with sudo"
+   echo "   Example: curl -sSL https://... | sudo bash"
    exit 1
 fi
 
@@ -36,7 +37,7 @@ if ! cryptsetup isLuks /dev/vda3 2>/dev/null; then
 fi
 echo "✅ /dev/vda3 is valid LUKS partition."
 
-# Install all required packages (including the critical one)
+# Install required packages (without dracut)
 echo
 echo "Installing required packages..."
 apt update
@@ -45,11 +46,10 @@ apt install -y \
     clevis-tpm2 \
     clevis-luks \
     clevis-initramfs \
-    clevis-dracut \
     tpm2-tools \
     initramfs-tools
 
-# Bind to TPM2 (using PCR 7 — you can change to "1,7" for more stability)
+# Bind to TPM2
 echo
 echo "Binding LUKS to TPM2..."
 if clevis luks list -d /dev/vda3 | grep -q tpm2; then
@@ -72,5 +72,4 @@ echo "Next step: Reboot and test"
 echo "   sudo reboot"
 echo
 echo "Useful commands:"
-echo "   sudo clevis luks list -d /dev/vda3          # Check binding"
-echo "   sudo cryptsetup luksDump /dev/vda3 | grep -A 30 Tokens:"
+echo "   sudo clevis luks list -d /dev/vda3"
