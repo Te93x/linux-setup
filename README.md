@@ -17,3 +17,8 @@ bash <(curl -sSL https://raw.githubusercontent.com/Te93x/linux-setup/refs/heads/
 ```bash
 bash <(curl -sSL https://raw.githubusercontent.com/Te93x/linux-setup/refs/heads/main/camofox-browser-setup.sh)
 ```
+
+## Install TPM2 LUKS
+```bash
+bash <(curl -sSL https://raw.githubusercontent.com/Te93x/linux-setup/refs/heads/main/tpm2-luks-setup.sh)
+```
