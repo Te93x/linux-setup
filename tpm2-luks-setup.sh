@@ -6,7 +6,7 @@
 
 set -euo pipefail
 
-echo "=== TPM2 LUKS Auto-Unlock Setup Script ==="
+echo "=== TPM2 LUKS Auto-Unlock Setup Script Latest ==="
 echo "This will bind /dev/vda3 to TPM2 for automatic unlocking."
 echo "You will be prompted for your current LUKS passphrase."
 echo
