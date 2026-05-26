@@ -1,17 +1,20 @@
 #!/bin/bash
 set -euo pipefail
 
-echo "=== Latest Docker Installation Script (Official + BuildKit + buildx) ==="
+echo "=== Latest Docker Installation Script (Docker Engine + Compose + Buildx) ==="
 
-# Prerequisites
+# Update package index
 sudo apt update
+
+# Install prerequisites
 sudo apt install -y ca-certificates curl
 
-# Docker official repo
+# Add Docker’s official GPG key
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 sudo chmod a+r /etc/apt/keyrings/docker.asc
 
+# Add Docker repository
 echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
   $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
@@ -19,37 +22,32 @@ echo \
 
 sudo apt update
 
-# Install
-sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+# === Install Docker Engine + Compose + Buildx ===
+sudo apt install -y \
+    docker-ce \
+    docker-ce-cli \
+    containerd.io \
+    docker-buildx-plugin \
+    docker-compose-plugin
 
-# Enable service
+# Enable and start Docker service
 sudo systemctl enable --now docker
 
-# Enable BuildKit (usually default now, but explicit is fine)
-sudo tee /etc/docker/daemon.json > /dev/null <<EOF
-{
-  "features": {
-    "buildkit": true
-  }
-}
-EOF
-
-# Create default builder
+# Create default buildx builder (BuildKit is enabled by default)
 docker buildx create --name default --use --bootstrap || true
 
-sudo systemctl restart docker
-
-# Add user to docker group
+# Add current user to docker group (so you don't need sudo)
 if ! groups | grep -q '\bdocker\b'; then
-  sudo usermod -aG docker "$USER"
-  echo "✅ Added $USER to docker group."
-  echo ""
-  echo "👉 To apply changes without rebooting, run this command now:"
-  echo "   su - $USER"
-  echo ""
-  echo "   (After that you can run docker commands without sudo)"
+    sudo usermod -aG docker "$USER"
+    echo "✅ Added $USER to the docker group."
+    echo "👉 Apply changes by running:   newgrp docker"
+    echo "   (or log out and log back in)"
 fi
 
 echo "================================================================"
-echo "✅ Docker + BuildKit + buildx setup complete!"
+echo "✅ Docker Engine + Docker Compose + Buildx installed successfully!"
 echo "================================================================"
+echo "Test with:"
+echo "   docker version"
+echo "   docker compose version"
+echo "   docker buildx version"
