@@ -49,15 +49,27 @@ apt install -y \
     tpm2-tools \
     initramfs-tools
 
-# Bind to TPM2
-echo
-echo "Binding LUKS to TPM2..."
+
+echo "Enter your current LUKS passphrase:"
+read -s -r passphrase
+
 if clevis luks list -d /dev/vda3 | grep -q tpm2; then
-    echo "⚠️  TPM2 binding already exists. Skipping bind."
+    echo "⚠️ TPM2 binding already exists."
 else
-    clevis luks bind -d /dev/vda3 tpm2 '{"pcr_ids":"7"}'
+    echo -n "$passphrase" | clevis luks bind -d /dev/vda3 tpm2 '{"pcr_ids":"7"}' -
     echo "✅ Successfully bound to TPM2 (PCR 7)."
 fi
+unset passphrase
+
+# # Bind to TPM2
+# echo
+# echo "Binding LUKS to TPM2..."
+# if clevis luks list -d /dev/vda3 | grep -q tpm2; then
+#     echo "⚠️  TPM2 binding already exists. Skipping bind."
+# else
+#     clevis luks bind -d /dev/vda3 tpm2 '{"pcr_ids":"7"}'
+#     echo "✅ Successfully bound to TPM2 (PCR 7)."
+# fi
 
 # Update initramfs
 echo
