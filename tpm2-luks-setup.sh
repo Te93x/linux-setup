@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================================
-# TPM2 LUKS Auto-Unlock Setup Script (Fixed for Ubuntu)
+# TPM2 LUKS Auto-Unlock Setup Script
 # For your system: /dev/vda3
 # =============================================================================
 
