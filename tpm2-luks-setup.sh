@@ -6,7 +6,7 @@
 
 set -euo pipefail
 
-echo "=== TPM2 LUKS Auto-Unlock Setup Script Latest ==="
+echo "=== TPM2 LUKS Auto-Unlock Setup Script ==="
 echo "This will bind /dev/vda3 to TPM2 for automatic unlocking."
 echo "You will be prompted for your current LUKS passphrase."
 echo
@@ -50,8 +50,8 @@ apt install -y \
     initramfs-tools
 
 
-echo "Enter your current LUKS passphrase:"
-read -s -r passphrase
+read -s -r -p "Enter your current LUKS passphrase: " passphrase < /dev/tty
+echo   # for the newline
 
 if clevis luks list -d /dev/vda3 | grep -q tpm2; then
     echo "⚠️ TPM2 binding already exists."
