@@ -53,38 +53,15 @@ apt install -y \
 echo
 echo "=== Binding LUKS to TPM2 ==="
 
-read -s -r -p "Enter your current LUKS passphrase: " passphrase < /dev/tty
+# Bind to TPM2
 echo
-
+echo "Binding LUKS to TPM2..."
 if clevis luks list -d /dev/vda3 | grep -q tpm2; then
-    echo "⚠️ TPM2 binding already exists. Skipping."
+    echo "⚠️  TPM2 binding already exists. Skipping bind."
 else
-    echo "Attempting to bind with TPM2 (PCR 7)..."
-    
-    # Better debug version
-    if echo -n "$passphrase" | clevis luks bind -d /dev/vda3 tpm2 '{"pcr_ids":"7"}' -; then
-        echo "✅ Successfully bound to TPM2 (PCR 7)."
-    else
-        echo "❌ Binding failed!"
-        echo "Possible reasons:"
-        echo "   - Wrong passphrase"
-        echo "   - TPM2 not working properly"
-        echo "   - Special characters in your password"
-        exit 1
-    fi
+    clevis luks bind -d /dev/vda3 tpm2 '{"pcr_ids":"7"}'
+    echo "✅ Successfully bound to TPM2 (PCR 7)."
 fi
-
-unset passphrase
-
-# # Bind to TPM2
-# echo
-# echo "Binding LUKS to TPM2..."
-# if clevis luks list -d /dev/vda3 | grep -q tpm2; then
-#     echo "⚠️  TPM2 binding already exists. Skipping bind."
-# else
-#     clevis luks bind -d /dev/vda3 tpm2 '{"pcr_ids":"7"}'
-#     echo "✅ Successfully bound to TPM2 (PCR 7)."
-# fi
 
 # Update initramfs
 echo
