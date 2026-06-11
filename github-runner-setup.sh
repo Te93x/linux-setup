@@ -3,7 +3,7 @@ set -euo pipefail
 sudo apt update
 sudo apt install -y libatomic1
 
-sudo apt-get install \
+sudo apt-get install -y \
     libnspr4 \
     libnss3 \
     libatk1.0-0t64 \
