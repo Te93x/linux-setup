@@ -24,3 +24,8 @@ curl -sSL https://raw.githubusercontent.com/Te93x/linux-setup/refs/heads/main/tp
 sudo bash /tmp/tpm2-luks-setup.sh && \
 rm -f /tmp/tpm2-luks-setup.sh
 ```
+
+## Install Github Runner Dependencies
+```bash
+bash <(curl -sSL https://raw.githubusercontent.com/Te93x/linux-setup/refs/heads/main/github-runner-setup.sh)
+```
