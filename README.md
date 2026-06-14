@@ -29,3 +29,8 @@ rm -f /tmp/tpm2-luks-setup.sh
 ```bash
 bash <(curl -sSL https://raw.githubusercontent.com/Te93x/linux-setup/refs/heads/main/github-runner-setup.sh)
 ```
+
+## Fix Time Sync
+```bash
+bash <(curl -sSL https://raw.githubusercontent.com/Te93x/linux-setup/refs/heads/main/fix-time-sync.sh)
+```
