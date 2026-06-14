@@ -30,7 +30,12 @@ rm -f /tmp/tpm2-luks-setup.sh
 bash <(curl -sSL https://raw.githubusercontent.com/Te93x/linux-setup/refs/heads/main/github-runner-setup.sh)
 ```
 
-## Fix Time Sync
+## Fix Github Runner Time Sync
 ```bash
 bash <(curl -sSL https://raw.githubusercontent.com/Te93x/linux-setup/refs/heads/main/fix-time-sync.sh)
+```
+
+## Boot Time Sync
+```bash
+bash <(curl -sSL https://raw.githubusercontent.com/Te93x/linux-setup/refs/heads/main/vm-chrony-boot-sync.sh)
 ```
