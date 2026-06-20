@@ -37,5 +37,8 @@ bash <(curl -sSL https://raw.githubusercontent.com/Te93x/linux-setup/refs/heads/
 
 ## Boot Time Sync
 ```bash
-bash <(curl -sSL https://raw.githubusercontent.com/Te93x/linux-setup/refs/heads/main/vm-chrony-boot-sync.sh)
+curl -fsSL https://raw.githubusercontent.com/Te93x/linux-setup/main/vm-chrony-boot-sync.sh -o vm-chrony-boot-sync.sh
+chmod +x vm-chrony-boot-sync.sh
+sudo ./vm-chrony-boot-sync.sh
+rm ./vm-chrony-boot-sync.sh
 ```
