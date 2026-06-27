@@ -20,7 +20,7 @@ apt-get update -qq
 apt-get install -y chrony ntpdate
 
 # 2. Update chrony.conf
-CHRONY_CONF="/etc/chrony/chrony.conf"
+CHRONY_CONF="/etc/chrony.conf"
 cp "$CHRONY_CONF" "${CHRONY_CONF}.bak.$(date +%F_%T)"
 sed -i 's/^makestep.*/makestep 1 -1/' "$CHRONY_CONF" || echo "makestep 1 -1" >> "$CHRONY_CONF"
 echo "   makestep set to: $(grep '^makestep' $CHRONY_CONF)"
