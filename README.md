@@ -32,7 +32,10 @@ bash <(curl -sSL https://raw.githubusercontent.com/Te93x/linux-setup/refs/heads/
 
 ## Fix Github Runner Time Sync
 ```bash
-bash <(curl -sSL https://raw.githubusercontent.com/Te93x/linux-setup/refs/heads/main/fix-time-sync.sh)
+curl -fsSL https://raw.githubusercontent.com/Te93x/linux-setup/refs/heads/main/fix-time-sync.sh -o fix-time-sync.sh
+chmod +x fix-time-sync.sh
+sudo ./fix-time-sync.sh
+rm ./fix-time-sync.sh
 ```
 
 ## Boot Time Sync
